@@ -36,7 +36,7 @@ const MyProfile = (props) => {
     // useEffect(()=>{
     //     getUserProfile()
     // },[]);
-
+    console.log('user================>',user)
     return(
         <Box>
             <Profile showEditFrom={()=>setShowEditFrom(true)} user={user}/>

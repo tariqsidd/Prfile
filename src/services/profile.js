@@ -4,6 +4,10 @@ const ProfileServices = {
     getProfiles: ()=> {
         return axiosInstance.get(`/profiles`)
     },
+    createProfiles: (paylaod)=> {
+        console.log('paylaodXXXXXXXXXXXXXXXXXX', paylaod)
+        return axiosInstance.post(`/profiles`,paylaod)
+    },
     getProfile: (id)=> {
         return axiosInstance.get(`/profiles/${id}`)
     },

@@ -9,7 +9,6 @@ const Auth = ({navigate})=>{
     useEffect(()=>{
         isLoggedIn() && navigate('/')
     });
-    console.log('Me HUN AUTH')
     return(
         view === 'sign-in' ?
             <SignIn navigate={navigate} setView={setView}/> :

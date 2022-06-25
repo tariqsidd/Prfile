@@ -11,6 +11,8 @@ import ProfileServices from "../../services/profile";
 import {setUser} from "../../Redux/Slice/userSlice";
 import {useDispatch} from "react-redux";
 import Loader from '../Loader'
+import Typography from "@mui/material/Typography";
+import Checkbox from "@mui/material/Checkbox";
 const EditExperience = ({show=false, onClose=()=>{}, expObject, user, edit})=>{
     const dispatch = useDispatch();
     const [city, setCity] = useState('');
@@ -18,6 +20,7 @@ const EditExperience = ({show=false, onClose=()=>{}, expObject, user, edit})=>{
     const [designation, setDesignation] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [currentCompany, setCurrentCompany] = useState(true);
     const [loading, setLoading] = useState(false);
     const [logo, setLogo] = useState({file:[], imageUrl:''});
 
@@ -32,6 +35,7 @@ const EditExperience = ({show=false, onClose=()=>{}, expObject, user, edit})=>{
             '';
 
         setCity(expObject.city);
+        setCurrentCompany(expObject.current_company)
         setCompanyName(expObject.company_name);
         setDesignation(expObject.designation);
         setStartDate(startDateValue);
@@ -60,17 +64,17 @@ const EditExperience = ({show=false, onClose=()=>{}, expObject, user, edit})=>{
             city,
             designation,
             ...(edit && {id: expObject.id}),
-            end_date:endDate,
+            current_company: currentCompany,
+            end_date: currentCompany? new Date() : endDate,
             start_date:startDate,
             company_name: companyName,
         };
 
         let selectedExpIndex = user.experience.findIndex((i)=> expObject.id===i.id);
         let payload = {
-            experience: expArr
+            experience: expArr,
         };
         edit? expArr[selectedExpIndex] = updatedExp : expArr.unshift(updatedExp);
-        // console.log('payload====>', payload);
         if(logo.file.length !==0){
             try {
                 const formData = new FormData();
@@ -110,7 +114,7 @@ const EditExperience = ({show=false, onClose=()=>{}, expObject, user, edit})=>{
                 designation === '' ||
                 startDate === ''
         }
-        if(edit && expObject.current_company){
+        if(edit && !expObject.current_company){
             return city === '' ||
                 companyName === '' ||
                 designation === '' ||
@@ -186,6 +190,13 @@ const EditExperience = ({show=false, onClose=()=>{}, expObject, user, edit})=>{
                         style={{marginRight:5 }}
                         onChange={(e)=> {setDesignation(e.target.value)}}/>
                 </Box>
+                <Box style={{display:'flex', flex:1, margin:10, alignItems:'center'}}>
+                    <Checkbox checked={currentCompany? true: false} onChange={(e,v)=>{setCurrentCompany(v)}}/>
+                    <Typography variant="subtitle1">
+                        I am currently working in this role
+                    </Typography>
+
+                </Box>
                 <Box style={{display:'flex', flex:1, margin:10}}>
                     <TextField
                         required
@@ -200,6 +211,7 @@ const EditExperience = ({show=false, onClose=()=>{}, expObject, user, edit})=>{
                         required
                         fullWidth
                         id="outlined-required"
+                        disabled={currentCompany}
                         value={endDate}
                         type={'date'}
                         helperText="End Date"

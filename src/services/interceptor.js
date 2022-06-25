@@ -2,7 +2,8 @@ import axios from 'axios';
 import store from '../Redux/Store';
 import { setError } from '../Redux/Slice/errorSlice';
 import {getToken} from "../utils";
-const BASE_URL = 'https://therapist-server.herokuapp.com/';
+const BASE_URL = 'https://therapist-server/.herokuapp.com/';
+// const BASE_URL = 'http://localhost:1337/';
 
 // Add a request interceptor
 let axiosInstance = axios.create({

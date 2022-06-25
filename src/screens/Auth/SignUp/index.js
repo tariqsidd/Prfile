@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -11,10 +11,33 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import {Paper} from "@mui/material";
 import Copyright from "../../../components/Copyright";
+import auth from "../../../services/auth";
+import {setUser} from "../../../Redux/Slice/userSlice";
+import {setToken} from "../../../utils";
+import {useDispatch} from "react-redux";
+import profile from "../../../services/profile";
 
-export default function SignUp({setView}) {
+export default function SignUp({setView, navigate}) {
+    const dispatch = useDispatch();
+    const [error, setError] = useState({
+        email: false,
+        firstName:false,
+        lastName:false,
+        password:false
+    });
 
-    const handleSubmit = (event) => {
+    const formValidation = (data)=>{
+        let {email, firstName, lastName, password, confirmPassword} = data;
+        setError({
+            email: email ==='',
+            firstName: firstName ==='',
+            lastName: lastName ==='',
+            password: password ==='' || (password !== confirmPassword)
+        });
+        return email !=='' && firstName !=='' && lastName !=='' && password === confirmPassword
+    };
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         console.log({
@@ -22,6 +45,32 @@ export default function SignUp({setView}) {
             email: data.get('email'),
             password: data.get('password'),
         });
+        let payload = {
+            email: data.get('email'),
+            firstName: data.get('firstName'),
+            lastName: data.get('lastName'),
+            password: data.get('password'),
+            confirmPassword: data.get('confirmPassword'),
+        };
+        if(formValidation(payload)){
+            let payload = {
+                username: `${data.get('firstName')} ${data.get('lastName')}`,
+                email:  data.get('email'),
+                password: data.get('password'),
+            };
+            try {
+                let {data} = await auth.register(payload);
+                console.log('registerData', data)
+                setToken(data.jwt);
+                let res = await profile.createProfiles({user:data.user.id, name: data.user.username});
+                dispatch(setUser(res.data));
+                setToken(data.jwt);
+                navigate('/')
+            }
+            catch (e) {
+                console.log('Register Err',e.message);
+            }
+        }
     };
 
     return (
@@ -51,6 +100,7 @@ export default function SignUp({setView}) {
                                     fullWidth
                                     id="firstName"
                                     label="First Name"
+                                    error={error.firstName}
                                     autoFocus
                                 />
                             </Grid>
@@ -61,6 +111,7 @@ export default function SignUp({setView}) {
                                     id="lastName"
                                     label="Last Name"
                                     name="lastName"
+                                    error={error.lastName}
                                     autoComplete="family-name"
                                 />
                             </Grid>
@@ -69,9 +120,10 @@ export default function SignUp({setView}) {
                                     required
                                     fullWidth
                                     id="email"
-                                    label="Email Address"
+                                    label="Email"
                                     name="email"
-                                    autoComplete="email"
+                                    error={error.email}
+                                    autoComplete="family-name"
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -82,6 +134,19 @@ export default function SignUp({setView}) {
                                     label="Password"
                                     type="password"
                                     id="password"
+                                    error={error.password}
+                                    autoComplete="new-password"
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    name="confirmPassword"
+                                    label="Confirm Password"
+                                    type="password"
+                                    id="confirmPassword"
+                                    error={error.password}
                                     autoComplete="new-password"
                                 />
                             </Grid>

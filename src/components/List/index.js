@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar/ListItemAvatar";
 import {Avatar, IconButton, Typography} from "@mui/material";
@@ -10,6 +10,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import moment from "moment";
 
 const _List = ({data=[], editExp, onClick}) => {
+
+    const sortedDates = (arr=[]) => {
+        return arr?.slice().sort((a, b)=>{
+            return moment(b?.start_date).format('X')-moment(a?.start_date).format('X')
+        });
+    };
+
+    let Data = sortedDates(data);
 
     const dividerCondition = (index)=>{
         return index === data.length-1 ? 'none' : 'block'
@@ -23,7 +31,7 @@ const _List = ({data=[], editExp, onClick}) => {
 
     return(
         <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-            {data.map((i, index)=>(
+            {Data.map((i, index)=>(
                 <Box key={index}>
                     <ListItem alignItems="flex-start">
                         <ListItemAvatar>

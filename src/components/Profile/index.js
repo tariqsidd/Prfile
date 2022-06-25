@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {Avatar, Box, Grid, IconButton, Paper, Typography} from "@mui/material";
 import {styles} from "../styles";
 import EditIcon from '@mui/icons-material/Edit';
@@ -7,7 +7,25 @@ import ProfilePicModal from "../profilePicModal";
 
 const Profile = ({user, showEditFrom})=>{
     const [showPicModal, setShowPicModal] = useState(false);
+    const [showGridCondition, setShowGridCondition] = useState(false);
+    const [currentCompany, setCurrentCompany] = useState([]);
     console.log('showEditFrom',showEditFrom)
+    const getCurrentCompany = (arr=[]) =>{
+        return  arr.reduce(function(filtered, option) {
+            if (option.current_company) {
+                let newValues = { company_name: option.company_name, logo: option.logo, designation: option.designation };
+                filtered.push(newValues);
+            }
+            return filtered;
+        }, []);
+    };
+    useEffect(()=>{
+        let company = getCurrentCompany(user.experience);
+        setCurrentCompany(company[0]);
+        setShowGridCondition(company?.length !==0)
+    },[user]);
+
+
     return(
         <Wrapper>
             <Paper style={styles.header}>
@@ -36,18 +54,20 @@ const Profile = ({user, showEditFrom})=>{
                             {user?.location}
                         </Typography>
                     </Grid>
+                    {showGridCondition?
                     <Grid item xs={4}>
                         <Box style={styles.logoCont} >
                             <Avatar
                                 style={{marginRight:5}}
                                 variant={'square'}
-                                alt="Remy Sharp"
-                                src={user?.current_company?.logo[0].formats.thumbnail.url}/>
+                                src={currentCompany?.logo?.url}/>
                             <Typography variant="subtitle2" gutterBottom >
-                                {user?.current_company?.company_name}
+                                {currentCompany?.company_name}
                             </Typography>
                         </Box>
-                    </Grid>
+                    </Grid> : null
+                    }
+
                 </Grid>
             </Paper>
             <ProfilePicModal

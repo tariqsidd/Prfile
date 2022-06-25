@@ -12,10 +12,10 @@ import {InvalidChar} from '../../utils'
 import Loader from '../Loader'
 const EditProfile = ({show, onClose, user}) => {
     const dispatch = useDispatch();
-    const [name, setName] = useState(user.name);
-    const [age, setAge] = useState(user.age);
-    const [location, setLocation] = useState(user.location);
-    const [topSkills, setTopSkills] = useState(user.top_skills);
+    const [name, setName] = useState(user?.name);
+    const [age, setAge] = useState(user?.age);
+    const [location, setLocation] = useState(user?.location);
+    const [topSkills, setTopSkills] = useState(user?.top_skills);
     const [loading, setLoading] = useState(false);
 
     const updateProfile = async ()=>{

@@ -20,6 +20,11 @@ const  SignIn =  ({setView, navigate}) => {
     const dispatch = useDispatch();
     const [error, setError] = useState({userNameError: false, passwordError:false, apiError: false});
 
+    const formValidation = (data)=>{
+        let {identifier, password} = data;
+        return identifier !=='' && password !==''
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -27,23 +32,29 @@ const  SignIn =  ({setView, navigate}) => {
             identifier: data.get('username'),
             password: data.get('password'),
         };
-        console.log('payload==>', payload);
-        try {
-            let {data} = await AuthServices.login(payload);
-            console.log('login Res',data);
-            dispatch(setUser(data.user.profile));
-            setToken(data.jwt);
-            console.log('TOKEN', getToken())
-            navigate('/')
+        if(formValidation(payload)){
+            try {
+                let {data} = await AuthServices.login(payload);
+                console.log('login Res',data);
+                dispatch(setUser(data.user.profile));
+                setToken(data.jwt);
+                console.log('TOKEN', getToken())
+                navigate('/')
+            }
+            catch (e) {
+                console.log('login Res',e.message);
+                setError({
+                    userNameError: !data.get('username'),
+                    passwordError: !data.get('password')
+                })
+            }
         }
-        catch (e) {
-            console.log('login Res',e.message);
+        else{
             setError({
                 userNameError: !data.get('username'),
                 passwordError: !data.get('password')
             })
         }
-
     };
     return (
         <Container component="main" maxWidth="xs">
